@@ -24,8 +24,9 @@ export default function Pulsar({ borderSize=500, particleSize=10, color }) {
     }
 
     function reduceSpeed(speed) {
-        let reduction = Math.abs(Math.ceil(speed / 10));
-        // let reduction = Math.ceil(maxSpeed * Math.abs(speed) / (Math.abs(speed) + 10)); // Logarithmic decay
+        // let reduction = Math.ceil(Math.abs(speed) / 10);
+        let reduction = Math.ceil(maxSpeed * Math.abs(speed) / (Math.abs(speed) + 10)); // Logarithmic decay
+        // reduction = 1;
         return (speed > 0)? speed - reduction : (speed < 0)? speed + reduction : 0;
     }
 
