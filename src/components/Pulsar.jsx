@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react"
 
 export default function Pulsar({ borderSize=500, particleSize=10, color }) {
-    const canvasRef = useRef(null)
-    let particleNumber = Math.floor(borderSize / particleSize)
+    const canvasRef = useRef(null);
+    let particleNumber = Math.floor(borderSize / particleSize);
     let maxSpeed = 3;
-    let frameTime = 100; //10ms
+    let frameTime = 80; //ms
 
     let mouseMovementMatrix = createMatrix([0, 0]);
     let mouseDistanceTraveled = 0;
-    let prevMousePosition = [0,0];
-    const mouseRadiusBoundary = [1,50]; //(radius in px unit)
+    const prevMousePosition = useRef([0,0]);
+    const mouseRadiusBoundary = [1, 50]; //(radius in px unit)
 
     let [particleMatrix, setParticleMatrix] = useState(new createMatrix([0, 0]));
     
@@ -24,8 +24,8 @@ export default function Pulsar({ borderSize=500, particleSize=10, color }) {
     }
 
     function reduceSpeed(speed) {
-        // let reduction = Math.ceil(Math.abs(speed) / 10);
-        let reduction = Math.ceil(maxSpeed * Math.abs(speed) / (Math.abs(speed) + 10)); // Logarithmic decay
+        let reduction = Math.ceil(Math.abs(speed) / 10);
+        // let reduction = Math.ceil(maxSpeed * Math.abs(speed) / (Math.abs(speed) + 10)); // Logarithmic decay
         // reduction = 1;
         return (speed > 0)? speed - reduction : (speed < 0)? speed + reduction : 0;
     }
@@ -89,7 +89,7 @@ export default function Pulsar({ borderSize=500, particleSize=10, color }) {
             }
         }
 
-        let mouseSpeed = Math.floor(mouseDistanceTraveled / frameTime);
+        let mouseSpeed = Math.floor(mouseDistanceTraveled / (frameTime / 7));
         let radius = Math.floor(Math.max(mouseRadiusBoundary[0] / particleSize, Math.min(radiusLength, mouseRadiusBoundary[1] / particleSize))); //(in index)
         let mouseMovementMatrixPostRadius = new createMatrix([0, 0]);
 
@@ -179,15 +179,14 @@ export default function Pulsar({ borderSize=500, particleSize=10, color }) {
             const i = Math.floor(x / particleSize);
             const j = Math.floor(y / particleSize);
 
-            const xDirection = x - prevMousePosition[0];
-            const yDirection = y - prevMousePosition[1];
+            const xDirection = x - prevMousePosition.current[0];
+            const yDirection = y - prevMousePosition.current[1];
 
-            if (prevMousePosition && i >= 0 && i < particleNumber && j>=0 && j < particleNumber) {
+            if (prevMousePosition.current && i >= 0 && i < particleNumber && j>=0 && j < particleNumber) {
                 mouseMovementMatrix[i][j] = [(xDirection > 0) ? 1 : (xDirection < 0) ? -1 : 0, (yDirection > 0) ? 1 : (yDirection < 0) ? -1 : 0];
             }
 
-            prevMousePosition = [x, y];
-
+            prevMousePosition.current = [x, y];
             mouseDistanceTraveled += Math.hypot(xDirection, yDirection);
         };
 
